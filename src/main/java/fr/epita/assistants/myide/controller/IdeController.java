@@ -1,9 +1,11 @@
 package fr.epita.assistants.myide.controller;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.epita.assistants.MyIde;
 import fr.epita.assistants.MyIde.*;
+import fr.epita.assistants.myide.model.CreateDTO;
 import fr.epita.assistants.myide.model.PathDTO;
 import fr.epita.assistants.myide.model.PathOnly;
 import fr.epita.assistants.MyIde.Configuration;
@@ -28,6 +31,7 @@ import fr.epita.assistants.myide.domain.entity.Project;
 import fr.epita.assistants.myide.domain.service.NodeService;
 import fr.epita.assistants.myide.domain.service.ProjectService;
 import fr.epita.assistants.myide.model.ProjectDTO;
+import fr.epita.assistants.myide.model.SaveDTO;
 import fr.epita.assistants.myide.myclass.nodeclass.FolderClass;
 import fr.epita.assistants.myide.myclass.projectclass.projectclass;
 import fr.epita.assistants.myide.myclass.nodeclass.FileClass;
@@ -36,8 +40,11 @@ import fr.epita.assistants.myide.myclass.nodeclass.FileClass;
 public class IdeController {
 
     
+    @Autowired
     ProjectService ps;
+    @Autowired
     NodeService ns;
+    @Autowired
     Project project;
 
     @GetMapping("/")
@@ -124,10 +131,101 @@ public class IdeController {
     }
 
     @PostMapping(
-        value = "/contentFile",
+        value = "/savefile",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
-        )
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+        public Boolean saveFile(@RequestBody SaveDTO path) throws IOException {
+            try {
+                if (path.path.equals("")) {
+                    return false;
+                }
+                File f = new File(path.path);
+                if (!f.exists()) {
+                    f.createNewFile();
+                }
+                FileWriter fw = new FileWriter(f.getAbsoluteFile());
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.write(path.content);
+                bw.close();
+                return true;
+            }
+            catch (IOException e) {
+                return false;
+            }
+        }
+
+    @PostMapping(
+        value = "/createnode",
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+        public Boolean CreateNode(@RequestBody CreateDTO path){
+            String[] strArray = path.path.split("/");
+            System.out.println(strArray);
+            System.out.println(project);
+            Node n = project.getRootNode();
+            for (int i = 0; i < strArray.length - 1; i++){
+                for (Node child : n.getChildren()){
+                    if (child.isFile()){
+                        if (((FileClass)child).getName().equals(strArray[i])){
+                            n = child;
+                            break;
+                        }
+                    }
+                    else {
+                        if (((FolderClass)child).getName().equals(strArray[i])){
+                            n = child;
+                            break;
+                        }
+                    }
+                }
+            }
+            Node.Types t = Node.Types.FILE;
+            if (path.isFolder){
+                t = Node.Types.FOLDER;
+            }
+            ns.create(n, strArray[strArray.length - 1], t);
+            return true;
+        }
+
+    
+        @PostMapping(
+            value = "/deletenode",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+            public Boolean DeleteNode(@RequestBody PathOnly path){
+                File f = new File(path.path);
+                if (!f.exists())
+                    return false;
+
+                String[] strArray = path.path.split("/");
+                System.out.println(strArray);
+                Node n = project.getRootNode();
+
+                for (int i = 0; i < strArray.length; i++){
+                    for (Node child : n.getChildren()){
+                        if (child.isFile()){
+                            if (((FileClass)child).getName().equals(strArray[i])){
+                                n = child;
+                                break;
+                            }
+                        }
+                        else {
+                            if (((FolderClass)child).getName().equals(strArray[i])){
+                                n = child;
+                                break;
+                            }
+                        }
+                    }
+                }
+                ns.delete(n);
+                return true;
+            }
+
+    @PostMapping(
+    value = "/contentFile",
+    consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+    )
     public String contentFile(@RequestBody PathOnly dto) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(dto.path));
     try {
@@ -168,6 +266,4 @@ public class IdeController {
         //removeparent(project.gelstRootNode());
         return new ProjectDTO((projectclass)project);
     }
-
-
 }
