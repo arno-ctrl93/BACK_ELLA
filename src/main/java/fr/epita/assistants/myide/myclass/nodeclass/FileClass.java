@@ -9,7 +9,7 @@ import fr.epita.assistants.myide.domain.entity.Node;
 
 public class FileClass implements Node {
 
-    private String name;
+    public String name;
     private Path path = null;
     private Node parent = null;
 

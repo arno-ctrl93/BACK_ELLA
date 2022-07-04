@@ -11,7 +11,7 @@ import fr.epita.assistants.myide.domain.entity.Node;
 
 public class FolderClass implements Node {
 
-    private String name;
+    public String name;
     private Path path = null;
     private List<Node> children = null;
     private Node parent = null;

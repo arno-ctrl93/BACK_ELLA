@@ -1,9 +1,15 @@
 package fr.epita.assistants.myide.controller;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.epita.assistants.MyIde;
 import fr.epita.assistants.MyIde.*;
+import fr.epita.assistants.myide.model.PathDTO;
+import fr.epita.assistants.myide.model.PathOnly;
 import fr.epita.assistants.MyIde.Configuration;
 import fr.epita.assistants.myide.domain.entity.Feature;
 import fr.epita.assistants.myide.domain.entity.Mandatory;
@@ -115,21 +123,44 @@ public class IdeController {
         return false;
     }
 
+    @PostMapping(
+        value = "/contentFile",
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+        )
+    public String contentFile(@RequestBody PathOnly dto) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(dto.path));
+    try {
+        StringBuilder sb = new StringBuilder();
+        String line = br.readLine();
+
+        while (line != null) {
+            sb.append(line);
+            sb.append(System.lineSeparator());
+            line = br.readLine();
+        }
+        String everything = sb.toString();
+        return everything;
+        } finally {
+            br.close();
+        }
+    }
 
 
 
-
-
-
-
-    @GetMapping("/init/{path}")
-    public ProjectDTO init(@PathVariable("path") final String path) {
+    @PostMapping(
+    value = "/init",
+    consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+    )
+    public ProjectDTO init(@RequestBody PathDTO dto) {
         System.out.println("======LOAD A PROJECT======");
-        System.out.println("Path: " + path);
-        Path p = Path.of(path);
+        System.out.println("Path: " + dto.path);
+        Path p = Path.of(dto.path);
         Configuration configuration = new Configuration(null, null);
         ProjectService ps = MyIde.init(configuration);
         Project project = ps.load(p);
+        ((FolderClass)project.getRootNode()).name = dto.name; 
         System.out.println("Project: " );
         System.out.println("path: "+ project.getRootNode());
         System.out.println("aspect: "+ project.getAspects());
