@@ -33,18 +33,15 @@ import fr.epita.assistants.myide.domain.service.NodeService;
 import fr.epita.assistants.myide.domain.service.ProjectService;
 import fr.epita.assistants.myide.model.ProjectDTO;
 import fr.epita.assistants.myide.model.SaveDTO;
+import fr.epita.assistants.myide.model.mvnCompileDTO;
 import fr.epita.assistants.myide.myclass.nodeclass.FolderClass;
 import fr.epita.assistants.myide.myclass.projectclass.projectclass;
 import fr.epita.assistants.myide.myclass.nodeclass.FileClass;
 
+
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 public class IdeController {
-
-    
-    ProjectService ps;
-    NodeService ns;
-    Project project;
 
 
     @GetMapping("/")
@@ -55,64 +52,83 @@ public class IdeController {
 
     @GetMapping("/search/{word}")
     public Feature.ExecutionReport search(@PathVariable String word) {
-        return project.getFeature(Mandatory.Features.Any.SEARCH).get().execute(project, word);
+        //return project.getFeature(Mandatory.Features.Any.SEARCH).get().execute(project, word);
+        return null;
     }
 
     @PostMapping("/git/add")
     public Feature.ExecutionReport gitAdd(@RequestBody List<String> files) {
-        return project.getFeature(Mandatory.Features.Git.ADD).get().execute(project, files);
+        //return project.getFeature(Mandatory.Features.Git.ADD).get().execute(project, files);
+        return null;
     }
 
     @PostMapping("/git/commit")
     public Feature.ExecutionReport gitCommit(@RequestBody String message) {
-        return project.getFeature(Mandatory.Features.Git.COMMIT).get().execute(project, message);
+        //return project.getFeature(Mandatory.Features.Git.COMMIT).get().execute(project, message);
+        return null;
     }
 
     @PostMapping("/git/push")
     public Feature.ExecutionReport gitPush(@RequestBody String remote) {
-        return project.getFeature(Mandatory.Features.Git.PUSH).get().execute(project, remote);
+        //return project.getFeature(Mandatory.Features.Git.PUSH).get().execute(project, remote);
+        return null;
     }
 
     @PostMapping("/git/pull")
     public Feature.ExecutionReport gitPull(@RequestBody String remote) {
-        return project.getFeature(Mandatory.Features.Git.PULL).get().execute(project, remote);
+        //return project.getFeature(Mandatory.Features.Git.PULL).get().execute(project, remote);
+        return null;
     }
 
 
 
     @PostMapping("/mvn/install")
     public Feature.ExecutionReport mvnInstall(@RequestBody String artifact) {
-        return project.getFeature(Mandatory.Features.Maven.INSTALL).get().execute(project, artifact);
+        //return project.getFeature(Mandatory.Features.Maven.INSTALL).get().execute(project, artifact);
+        return null;
     }
 
-    @PostMapping("/mvn/compile")
-    public Feature.ExecutionReport mvnCompile() {
+    @PostMapping(
+    value = "/mvn/compile",
+    consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public Feature.ExecutionReport mvnCompile(@RequestBody mvnCompileDTO path) {
+        Path p = Path.of(path.rootpath);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+        NodeService ns = ps.getNodeService();
         return project.getFeature(Mandatory.Features.Maven.COMPILE).get().execute(project);
     }
 
     @PostMapping("/mvn/test")
     public Feature.ExecutionReport mvnTest() {
-        return project.getFeature(Mandatory.Features.Maven.TEST).get().execute(project);
+        //return project.getFeature(Mandatory.Features.Maven.TEST).get().execute(project);
+        return null;
     }
 
     @PostMapping("/mvn/package")
     public Feature.ExecutionReport mvnPackage() {
-        return project.getFeature(Mandatory.Features.Maven.PACKAGE).get().execute(project);
+        //return project.getFeature(Mandatory.Features.Maven.PACKAGE).get().execute(project);
+        return null;
     }
 
     @PostMapping("/mvn/clean")
     public Feature.ExecutionReport mvnClean() {
-        return project.getFeature(Mandatory.Features.Maven.CLEAN).get().execute(project);
+        //return project.getFeature(Mandatory.Features.Maven.CLEAN).get().execute(project);
+        return null;
     }
 
     @PostMapping("/mvn/exec")
     public Feature.ExecutionReport mvnExec(@RequestBody String command) {
-        return project.getFeature(Mandatory.Features.Maven.COMPILE).get().execute(project, command);
+        //return project.getFeature(Mandatory.Features.Maven.COMPILE).get().execute(project, command);
+        return null;
     }
 
     @PostMapping("/mvn/tree")
     public Feature.ExecutionReport mvnTree() {
-        return project.getFeature(Mandatory.Features.Maven.TREE).get().execute(project);
+        //return project.getFeature(Mandatory.Features.Maven.TREE).get().execute(project);
+        return null;
     }
 
     @PostMapping("/move")
@@ -159,6 +175,16 @@ public class IdeController {
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
         public Boolean CreateNode(@RequestBody CreateDTO path){
+            
+            
+            Path p = Path.of(path.rootpath);
+            Configuration configuration = new Configuration(null, null);
+            ProjectService ps = MyIde.init(configuration);
+            Project project = ps.load(p);
+            NodeService ns = ps.getNodeService();
+
+
+
             String[] strArray = path.path.split("/");
             System.out.println(strArray);
             System.out.println(project);
@@ -196,6 +222,13 @@ public class IdeController {
                 File f = new File(path.path);
                 if (!f.exists())
                     return false;
+
+                
+            Path p = Path.of(path.rootpath);
+            Configuration configuration = new Configuration(null, null);
+            ProjectService ps = MyIde.init(configuration);
+            Project project = ps.load(p);
+            NodeService ns = ps.getNodeService();
 
                 String[] strArray = path.path.split("/");
                 System.out.println(strArray);
@@ -243,6 +276,11 @@ public class IdeController {
             br.close();
         }
     }
+
+    //@GetMapping("/getfilearbo")
+
+
+
 
 
 
