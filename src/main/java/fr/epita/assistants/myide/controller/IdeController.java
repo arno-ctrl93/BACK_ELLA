@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,15 +38,14 @@ import fr.epita.assistants.myide.myclass.projectclass.projectclass;
 import fr.epita.assistants.myide.myclass.nodeclass.FileClass;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class IdeController {
 
     
-    @Autowired
     ProjectService ps;
-    @Autowired
     NodeService ns;
-    @Autowired
     Project project;
+
 
     @GetMapping("/")
     public String index() {
@@ -248,8 +248,8 @@ public class IdeController {
 
     @PostMapping(
     value = "/init",
-    consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+    consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
     public ProjectDTO init(@RequestBody PathDTO dto) {
         System.out.println("======LOAD A PROJECT======");
@@ -263,7 +263,6 @@ public class IdeController {
         System.out.println("path: "+ project.getRootNode());
         System.out.println("aspect: "+ project.getAspects());
         System.out.println("children size: "+ project.getRootNode().getChildren().size());
-        //removeparent(project.gelstRootNode());
         return new ProjectDTO((projectclass)project);
     }
 }
