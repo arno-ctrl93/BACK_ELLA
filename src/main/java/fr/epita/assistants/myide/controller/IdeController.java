@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.epita.assistants.MyIde;
 import fr.epita.assistants.MyIde.*;
 import fr.epita.assistants.myide.model.CreateDTO;
+import fr.epita.assistants.myide.model.NodeDTO;
 import fr.epita.assistants.myide.model.PathDTO;
 import fr.epita.assistants.myide.model.PathOnly;
 import fr.epita.assistants.MyIde.Configuration;
@@ -485,6 +487,38 @@ public class IdeController {
         arboDTO ad =  new arboDTO(pd.root);
         arboidincr(ad, 0);
         return ad;
+
+    }
+
+
+    public ArrayList<String> getPath(NodeDTO n){
+        ArrayList<String> path = new ArrayList<String>();
+        path.add(n.path);
+        for (NodeDTO nd : n.children){
+            ArrayList<String> path2 = getPath(nd);
+            for (String s : path2){
+                path.add(s);
+            }
+        }
+        return path;
+    }
+
+
+    @GetMapping("/allfileslist")
+    public List<String> allFilesList() throws IOException {
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+        NodeService ns = ps.getNodeService();
+        ProjectDTO pd = new ProjectDTO((projectclass)project);
+        return getPath(pd.root);
+
 
     }
 }
