@@ -2,11 +2,14 @@ package fr.epita.assistants.myide.controller;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -33,10 +36,16 @@ import fr.epita.assistants.myide.domain.service.NodeService;
 import fr.epita.assistants.myide.domain.service.ProjectService;
 import fr.epita.assistants.myide.model.ProjectDTO;
 import fr.epita.assistants.myide.model.SaveDTO;
+import fr.epita.assistants.myide.model.arboDTO;
+import fr.epita.assistants.myide.model.gitAddDTO;
+import fr.epita.assistants.myide.model.gitCommitDTO;
 import fr.epita.assistants.myide.model.mvnCompileDTO;
+import fr.epita.assistants.myide.model.mvnExecuteDTO;
 import fr.epita.assistants.myide.myclass.nodeclass.FolderClass;
 import fr.epita.assistants.myide.myclass.projectclass.projectclass;
 import fr.epita.assistants.myide.myclass.nodeclass.FileClass;
+
+
 
 
 @RestController
@@ -56,44 +65,108 @@ public class IdeController {
         return null;
     }
 
-    @PostMapping("/git/add")
-    public Feature.ExecutionReport gitAdd(@RequestBody List<String> files) {
-        //return project.getFeature(Mandatory.Features.Git.ADD).get().execute(project, files);
-        return null;
+    @PostMapping(
+        value = "/git/add",
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public Feature.ExecutionReport gitAdd(@RequestBody gitAddDTO dto) throws IOException {
+        
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+
+        return project.getFeature(Mandatory.Features.Git.ADD).get().execute(project, dto.files);
+        //return null;
     }
 
     @PostMapping("/git/commit")
-    public Feature.ExecutionReport gitCommit(@RequestBody String message) {
-        //return project.getFeature(Mandatory.Features.Git.COMMIT).get().execute(project, message);
-        return null;
+    public Feature.ExecutionReport gitCommit(@RequestBody gitCommitDTO message) throws IOException {
+        
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+
+        return project.getFeature(Mandatory.Features.Git.COMMIT).get().execute(project, message.message);
+        //return null;
     }
 
     @PostMapping("/git/push")
-    public Feature.ExecutionReport gitPush(@RequestBody String remote) {
-        //return project.getFeature(Mandatory.Features.Git.PUSH).get().execute(project, remote);
-        return null;
+    public Feature.ExecutionReport gitPush(@RequestBody gitCommitDTO remote) throws IOException {
+        
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+
+        return project.getFeature(Mandatory.Features.Git.PUSH).get().execute(project);
+        //return null;
     }
 
     @PostMapping("/git/pull")
-    public Feature.ExecutionReport gitPull(@RequestBody String remote) {
-        //return project.getFeature(Mandatory.Features.Git.PULL).get().execute(project, remote);
-        return null;
+    public Feature.ExecutionReport gitPull(@RequestBody gitCommitDTO remote) throws IOException {
+        
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+
+        return project.getFeature(Mandatory.Features.Git.PULL).get().execute(project);
+        //return null;
     }
 
 
 
     @PostMapping("/mvn/install")
-    public Feature.ExecutionReport mvnInstall(@RequestBody String artifact) {
-        //return project.getFeature(Mandatory.Features.Maven.INSTALL).get().execute(project, artifact);
-        return null;
+    public Feature.ExecutionReport mvnInstall(@RequestBody mvnCompileDTO dto) throws IOException {
+        
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+
+        return project.getFeature(Mandatory.Features.Maven.INSTALL).get().execute(project);
+        //return null;
     }
 
     @PostMapping(
     value = "/mvn/compile",
     consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
     produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Feature.ExecutionReport mvnCompile(@RequestBody mvnCompileDTO path) {
-        Path p = Path.of(path.rootpath);
+    public Feature.ExecutionReport mvnCompile(@RequestBody mvnCompileDTO path) throws IOException {
+        
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
         Configuration configuration = new Configuration(null, null);
         ProjectService ps = MyIde.init(configuration);
         Project project = ps.load(p);
@@ -101,34 +174,102 @@ public class IdeController {
         return project.getFeature(Mandatory.Features.Maven.COMPILE).get().execute(project);
     }
 
-    @PostMapping("/mvn/test")
-    public Feature.ExecutionReport mvnTest() {
-        //return project.getFeature(Mandatory.Features.Maven.TEST).get().execute(project);
-        return null;
+    @PostMapping(
+        value = "/mvn/test",
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public Feature.ExecutionReport mvnTest(@RequestBody mvnCompileDTO path) throws IOException {
+        
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+        NodeService ns = ps.getNodeService();
+        return project.getFeature(Mandatory.Features.Maven.TEST).get().execute(project);
+        //return null;
     }
 
-    @PostMapping("/mvn/package")
-    public Feature.ExecutionReport mvnPackage() {
-        //return project.getFeature(Mandatory.Features.Maven.PACKAGE).get().execute(project);
-        return null;
+    @PostMapping(
+        value = "/mvn/package",
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public Feature.ExecutionReport mvnPackage(@RequestBody mvnCompileDTO path) throws IOException {
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+
+        return project.getFeature(Mandatory.Features.Maven.PACKAGE).get().execute(project);
+        //return null;
     }
 
-    @PostMapping("/mvn/clean")
-    public Feature.ExecutionReport mvnClean() {
-        //return project.getFeature(Mandatory.Features.Maven.CLEAN).get().execute(project);
-        return null;
+    @PostMapping(
+        value = "/mvn/clean",
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public Feature.ExecutionReport mvnClean(@RequestBody mvnCompileDTO path) throws IOException {
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+        //NodeService ns = ps.getNodeService();
+
+        return project.getFeature(Mandatory.Features.Maven.CLEAN).get().execute(project);
+        //return null;
     }
 
-    @PostMapping("/mvn/exec")
-    public Feature.ExecutionReport mvnExec(@RequestBody String command) {
-        //return project.getFeature(Mandatory.Features.Maven.COMPILE).get().execute(project, command);
-        return null;
+    @PostMapping(
+        value = "/mvn/execute",
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public Feature.ExecutionReport mvnExec(@RequestBody mvnExecuteDTO command) throws IOException {
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+
+        return project.getFeature(Mandatory.Features.Maven.COMPILE).get().execute(project, command.command);
+        //return null;
     }
 
-    @PostMapping("/mvn/tree")
-    public Feature.ExecutionReport mvnTree() {
-        //return project.getFeature(Mandatory.Features.Maven.TREE).get().execute(project);
-        return null;
+    @PostMapping(
+        value = "/mvn/tree",
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public Feature.ExecutionReport mvnTree(mvnCompileDTO command) throws IOException {
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+        NodeService ns = ps.getNodeService();
+
+        return project.getFeature(Mandatory.Features.Maven.TREE).get().execute(project);
+        //return null;
     }
 
     @PostMapping("/move")
@@ -174,10 +315,13 @@ public class IdeController {
         value = "/createnode",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-        public Boolean CreateNode(@RequestBody CreateDTO path){
+        public Boolean CreateNode(@RequestBody CreateDTO path) throws IOException{
+            File doc = new File("the-file-name.txt");
+            BufferedReader obj = new BufferedReader(new FileReader(doc));
+            String strng = obj.readLine();
+            System.out.println("test : " + strng);
             
-            
-            Path p = Path.of(path.rootpath);
+            Path p = Path.of(strng);
             Configuration configuration = new Configuration(null, null);
             ProjectService ps = MyIde.init(configuration);
             Project project = ps.load(p);
@@ -218,13 +362,16 @@ public class IdeController {
             value = "/deletenode",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-            public Boolean DeleteNode(@RequestBody PathOnly path){
+            public Boolean DeleteNode(@RequestBody PathOnly path) throws IOException{
                 File f = new File(path.path);
                 if (!f.exists())
                     return false;
-
-                
-            Path p = Path.of(path.rootpath);
+            File doc = new File("the-file-name.txt");
+            BufferedReader obj = new BufferedReader(new FileReader(doc));
+            String strng = obj.readLine();
+            System.out.println("test : " + strng);
+            
+            Path p = Path.of(strng);
             Configuration configuration = new Configuration(null, null);
             ProjectService ps = MyIde.init(configuration);
             Project project = ps.load(p);
@@ -289,7 +436,7 @@ public class IdeController {
     consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE},
     produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
-    public ProjectDTO init(@RequestBody PathDTO dto) {
+    public ProjectDTO init(@RequestBody PathDTO dto) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("======LOAD A PROJECT======");
         System.out.println("Path: " + dto.path);
         Path p = Path.of(dto.path);
@@ -301,6 +448,46 @@ public class IdeController {
         System.out.println("path: "+ project.getRootNode());
         System.out.println("aspect: "+ project.getAspects());
         System.out.println("children size: "+ project.getRootNode().getChildren().size());
+
+        PrintWriter writer = new PrintWriter("the-file-name.txt", "UTF-8");
+        writer.println(dto.path);
+        writer.close();
+
         return new ProjectDTO((projectclass)project);
     }
+
+
+    public int arboidincr(arboDTO ab, int count){
+        if (count == 0)
+            ab.id = "root";
+        else
+            ab.id = Integer.toString(count);
+        count ++;
+        for (arboDTO a : ab.children){
+            count = arboidincr(a, count);
+        }
+        return count;
+    }
+
+    @PostMapping(
+    value = "/arbofile",
+    consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE}
+    )
+    public arboDTO arboFile(@RequestBody PathOnly dto) {
+        //System.out.println("======LOAD A PROJECT======");
+        System.out.println("Path: " + dto.path);
+        Path p = Path.of(dto.path);
+        Configuration configuration = new Configuration(null, null);
+        ProjectService ps = MyIde.init(configuration);
+        Project project = ps.load(p);
+        ProjectDTO pd = new ProjectDTO((projectclass)project);
+        arboDTO ad =  new arboDTO(pd.root);
+        arboidincr(ad, 0);
+        return ad;
+
+    }
 }
+
+
+
