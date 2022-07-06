@@ -476,10 +476,14 @@ public class IdeController {
     consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE},
     produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
-    public arboDTO arboFile(@RequestBody PathOnly dto) {
+    public arboDTO arboFile(@RequestBody PathOnly dto) throws IOException {
         //System.out.println("======LOAD A PROJECT======");
-        System.out.println("Path: " + dto.path);
-        Path p = Path.of(dto.path);
+        File doc = new File("the-file-name.txt");
+        BufferedReader obj = new BufferedReader(new FileReader(doc));
+        String strng = obj.readLine();
+        System.out.println("test : " + strng);
+        
+        Path p = Path.of(strng);
         Configuration configuration = new Configuration(null, null);
         ProjectService ps = MyIde.init(configuration);
         Project project = ps.load(p);
